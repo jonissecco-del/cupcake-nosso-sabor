@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nosso Sabor - Criar Conta</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Arial, sans-serif; }
+        body { background-color: #fcf8f2; color: #4a3728; display: flex; flex-direction: column; min-height: 100vh; }
+        
+        /* Cabeçalho */
+        header { background-color: #ffb7c5; padding: 20px; text-align: center; border-bottom: 5px solid #ff94a2; }
+        header h1 { font-size: 2.5rem; color: #fff; margin-bottom: 10px; }
+        nav a { color: #fff; text-decoration: none; margin: 0 15px; font-weight: bold; font-size: 1.1rem; }
+        nav a:hover { text-decoration: underline; }
+
+        /* Alertas */
+        .alerta { max-width: 400px; margin: 20px auto -10px; padding: 12px; border-radius: 8px; text-align: center; font-weight: bold; }
+        .alerta.erro { background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+
+        /* Caixa de Registro Centralizada */
+        main { flex: 1; display: flex; align-items: center; justify-content: center; padding: 20px; }
+        .box-registro { width: 100%; max-width: 400px; background: #fff; padding: 40px 30px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); border: 1px solid #ffe3e8; text-align: center; }
+        .box-registro h2 { margin-bottom: 25px; color: #ff94a2; font-size: 1.8rem; }
+        
+        /* Campos do Formulário */
+        .grupo-campo { margin-bottom: 20px; text-align: left; }
+        .grupo-campo label { display: block; margin-bottom: 6px; font-weight: bold; font-size: 0.9rem; }
+        .grupo-campo input { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 1rem; }
+        .grupo-campo input:focus { border-color: #ff94a2; outline: none; box-shadow: 0 0 5px rgba(255, 148, 162, 0.3); }
+        
+        /* Botão */
+        .btn-registrar { width: 100%; background-color: #ff94a2; color: white; border: none; padding: 12px; border-radius: 25px; cursor: pointer; font-weight: bold; font-size: 1.1rem; transition: background 0.2s; }
+        .btn-registrar:hover { background-color: #ff7687; }
+        
+        .link-login { margin-top: 20px; font-size: 0.95rem; }
+        .link-login a { color: #ff94a2; font-weight: bold; text-decoration: none; }
+        .link-login a:hover { text-decoration: underline; }
+
+        /* Rodapé */
+        footer { background-color: #4a3728; color: #fff; text-align: center; padding: 15px; font-size: 0.9rem; }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>🧁 Nosso Sabor</h1>
+        <nav>
+            <a href="{{ url_for('home') }}">Início</a>
+            <a href="{{ url_for('login') }}">Entrar (Login)</a>
+            <a href="{{ url_for('registro') }}">Cadastrar</a>
+        </nav>
+    </header>
+
+    <!-- Mostra avisos caso as senhas digitadas não fiquem iguais -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for categoria, message in messages %}
+          <div class="alerta {{ categoria }}">{{ message }}</div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+
+    <main>
+        <div class="box-registro">
+            <h2>Criar Nova Conta</h2>
+            <form action="/registro" method="POST">
+                <div class="grupo-campo">
+                    <label>Número de Celular:</label>
+                    <input type="tel" name="celular" required placeholder="Ex: 51999999999">
+                </div>
+                <div class="grupo-campo">
+                    <label>Senha:</label>
+                    <input type="password" name="senha" required placeholder="Crie uma senha estável">
+                </div>
+                <div class="grupo-campo">
+                    <label>Confirme a Senha:</label>
+                    <input type="password" name="confirma_senha" required placeholder="Repita a senha">
+                </div>
+                <button type="submit" class="btn-registrar">Salvar Cadastro</button>
+            </form>
+            <div class="link-login">
+                Já possui uma conta? <a href="/login">Faça o login aqui</a>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2026 Nosso Sabor Cupcakes - Sistema Acadêmico.</p>
+    </footer>
+
+</body>
+</html>

@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nosso Sabor - Seu Carrinho</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Arial, sans-serif; }
+        body { background-color: #fcf8f2; color: #4a3728; display: flex; flex-direction: column; min-height: 100vh; }
+        header { background-color: #ffb7c5; padding: 20px; text-align: center; border-bottom: 5px solid #ff94a2; }
+        header h1 { font-size: 2.5rem; color: #fff; margin-bottom: 10px; }
+        .menu-container { display: flex; justify-content: center; align-items: center; flex-wrap: wrap; gap: 15px; }
+        nav a { color: #fff; text-decoration: none; font-weight: bold; font-size: 1.1rem; padding: 5px 10px; }
+        nav a:hover { text-decoration: underline; }
+        .usuario-logado { background-color: #ff7687; color: white; padding: 5px 15px; border-radius: 15px; font-weight: bold; font-size: 0.95rem; }
+        .btn-sair { color: #4a3728 !important; font-size: 0.9rem !important; margin-left: 5px; }
+
+        .alerta { max-width: 500px; margin: 20px auto 0; padding: 10px; border-radius: 8px; text-align: center; font-weight: bold; font-size: 0.9rem; }
+        .alerta.sucesso { background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+
+        main { flex: 1; max-width: 800px; width: 100%; margin: 40px auto; padding: 0 20px; text-align: center; }
+        .titulo-carrinho { font-size: 2rem; margin-bottom: 30px; color: #4a3728; }
+        
+        .item-carrinho { background: #fff; border: 1px solid #ffe3e8; padding: 15px; border-radius: 8px; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.02); }
+        .item-info { display: flex; align-items: center; gap: 15px; }
+        .item-info img { width: 60px; height: 60px; object-fit: cover; border-radius: 6px; background-color: #eee; }
+        .item-detalhes { text-align: left; }
+        .item-nome { font-weight: bold; font-size: 1.1rem; display: block; }
+        .item-qtd { font-size: 0.9rem; color: #7a6351; }
+        
+        .item-acoes { display: flex; align-items: center; gap: 20px; }
+        .item-preco { color: #ff94a2; font-weight: bold; font-size: 1.1rem; }
+        .btn-remover { color: #721c24; background-color: #f8d7da; border: 1px solid #f5c6cb; text-decoration: none; padding: 5px 10px; border-radius: 6px; font-size: 0.85rem; font-weight: bold; transition: background 0.2s; }
+        .btn-remover:hover { background-color: #f5c6cb; }
+
+        .resumo-total { font-size: 1.5rem; font-weight: bold; margin: 30px 0; text-align: right; border-top: 2px dashed #ff94a2; padding-top: 15px; }
+        .btn-fechar { display: inline-block; background-color: #4CAF50; color: white; border: none; padding: 15px 40px; border-radius: 35px; cursor: pointer; font-weight: bold; font-size: 1.2rem; text-decoration: none; transition: background 0.2s; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        .btn-fechar:hover { background-color: #45a049; }
+        .carrinho-vazio { font-size: 1.2rem; color: #7a6351; margin-top: 40px; }
+        .btn-voltar { display: inline-block; margin-top: 20px; color: #ff94a2; font-weight: bold; text-decoration: none; }
+        .btn-voltar:hover { text-decoration: underline; }
+        
+        footer { background-color: #4a3728; color: #fff; text-align: center; padding: 15px; font-size: 0.9rem; margin-top: 40px; }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>🧁 Nosso Sabor</h1>
+        <div class="menu-container">
+            <nav>
+                <a href="{{ url_for('home') }}">Início</a>
+                <a href="{{ url_for('ver_carrinho') }}">🛒 Carrinho ({{ itens|sum(attribute='quantidade') }})</a>
+                {% if session.get('usuario') %}
+                    <span class="usuario-logado">📱 {{ session.get('usuario') }}</span>
+                    <a href="{{ url_for('logout') }}" class="btn-sair">(Sair)</a>
+                {% else %}
+                    <a href="{{ url_for('login') }}">Entrar (Login)</a>
+                    <a href="{{ url_for('registro') }}">Cadastrar</a>
+                {% endif %}
+            </nav>
+        </div>
+    </header>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for categoria, message in messages %}
+          <div class="alerta {{ categoria }}">{{ message }}</div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+
+    <main>
+        <h2 class="titulo-carrinho">Seu Carrinho de Compras</h2>
+
+        {% if itens %}
+            {% for item in itens %}
+            <div class="item-carrinho">
+                <div class="item-info">
+                    <img src="{{ url_for('static', filename=item.imagem) }}" alt="{{ item.nome }}">
+                    <div class="item-detalhes">
+                        <span class="item-nome">{{ item.nome }}</span>
+                        <span class="item-qtd">Quantidade: {{ item.quantidade }}x</span>
+                    </div>
+                </div>
+                
+                <div class="item-acoes">
+                    <span class="item-preco">R$ {{ "%.2f"|format(item.preco * item.quantidade)|replace('.', ',') }}</span>
+                    
+                    <!-- Sistema dinâmico direto que lê o ID injetado no dicionário -->
+                    <a href="/remover/{{ item.id }}" class="btn-remover">Remover</a>
+                </div>
+            </div>
+            {% endfor %}
+
+            <div class="resumo-total">
+                Valor Total: R$ {{ total }}
+            </div>
+
+            <a href="{{ url_for('fechar_pedido') }}" class="btn-fechar">Fechar Pedido</a>
+
+        {% else %}
+            <p class="carrinho-vazio">Seu carrinho está vazio.</p>
+            <a href="{{ url_for('home') }}" class="btn-voltar">← Voltar para a vitrine e escolher cupcakes</a>
+        {% endif %}
+    </main>
+
+    <footer>
+        <p>&copy; 2026 Nosso Sabor Cupcakes - Sistema Acadêmico.</p>
+    </footer>
+
+</body>
+</html>
